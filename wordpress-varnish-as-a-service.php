@@ -313,7 +313,7 @@ class WPVarnish {
 	function WPVarnishPurgeObject($wpv_url) {
 		global $varnish_servers;
 		$j=0;
-		if(get_option("wpvarnish_server")) {
+		if(get_option("wpvarnish_server_1")) {
 			$array_wpv_purgeaddr[$j] = get_option("wpvarnish_addr_1");
 			$array_wpv_purgeport[$j] = get_option("wpvarnish_port_1");
 			$array_wpv_secret[$j] = get_option("wpvarnish_secret_1");
