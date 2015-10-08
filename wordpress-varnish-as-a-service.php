@@ -381,10 +381,17 @@ class WPVarnish {
 						fwrite($varnish_sock, $out."\n");
 					}
 				} else {
-					$out = "PURGE $wpv_url HTTP/1.0\r\n";
-					$out .= "Host: $wpv_host\r\n";
-					$out .= "Connection: Close\r\n\r\n";
-					fwrite($varnish_sock, $out);
+					if ($wpv_use_version == 3) {
+						$out = "BAN HTTP/1.0\r\n";
+						$out .= "X-Ban-Url: $wpv_url\r\n";
+						$out .= "X-Ban-Host: $wpv_host\r\n";
+						$out .= "Connection: Close\r\n\r\n";
+					} else {	
+						$out = "PURGE $wpv_url HTTP/1.0\r\n";
+						$out .= "Host: $wpv_host\r\n";
+						$out .= "Connection: Close\r\n\r\n";
+					}	
+					fwrite($varnish_sock, $out."\n");
 				}
 				fclose($varnish_sock);
 			}
@@ -468,16 +475,32 @@ class WPVarnish {
 					}
 				}
 			} else {
-				$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - HTTP Purge",'wp-varnish-aas')."</span></li>\n";
-				$out = "PURGE $wpv_url HTTP/1.0\r\n";
-				$out .= "Host: $wpv_host\r\n";
-				$out .= "Connection: Close\r\n\r\n";
-				fwrite($varnish_sock, $out);
-				$buf = fread($varnish_sock, 256);
-				if(preg_match('/200 OK/', $buf)) {
-					$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Request",'wp-varnish-aas')."</span></li>\n";
+				if ($wpv_use_version == 3) {
+					$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - HTTP BAN",'wp-varnish-aas')."</span></li>\n";
+					$out = "BAN HTTP/1.0\r\n";
+					$out .= "X-Ban-Url: $wpv_url\r\n";
+					$out .= "X-Ban-Host: $wpv_host\r\n";
+					$out .= "Connection: Close\r\n\r\n";
+					fwrite($varnish_sock, $out."\n");
+					$buf = fread($varnish_sock, 256);
+					if(preg_match('/200/', $buf)) {
+						$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Cache flush",'wp-varnish-aas')."</span></li>\n";
+					} else {
+						$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Cache flush",'wp-varnish-aas')."</span><br><small>".__("Verify your Varnish version",'wp-varnish-aas')."</small></li>\n";
+					}
+
 				} else {
-					$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Request",'wp-varnish-aas')."</span></li>\n";
+					$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - HTTP Purge",'wp-varnish-aas')."</span></li>\n";
+					$out = "PURGE $wpv_url HTTP/1.0\r\n";
+					$out .= "Host: $wpv_host\r\n";
+					$out .= "Connection: Close\r\n\r\n";
+					fwrite($varnish_sock, $out);
+					$buf = fread($varnish_sock, 256);
+					if(preg_match('/200 OK/', $buf) || preg_match('/404/', $buf)) {
+						$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Request",'wp-varnish-aas')."</span></li>\n";
+					} else {
+						$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Request",'wp-varnish-aas')."</span></li>\n";
+					}
 				}
 			}
 			fclose($varnish_sock);
