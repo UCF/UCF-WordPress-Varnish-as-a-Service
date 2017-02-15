@@ -2,8 +2,8 @@
 Contributors: jartes, JavierCasares
 Tags: varnish, cache, purge, ban
 Requires at least: 2.5
-Tested up to: 4.1
-Stable tag: 1.2.1
+Tested up to: 4.7.2
+Stable tag: 1.2.3
 
 Clear your Varnish cache when new, edited or deleted content happens.
 
@@ -26,6 +26,14 @@ Based on <a href="http://wordpress.org/extend/plugins/wordpress-varnish/">WordPr
 1. Configuration.
 
 == Changelog ==
+
+= 1.2.3 =
+ * Minor update
+
+= 1.2.2 =
+ * WordPress 4.7.2 compatibility
+ * Fix minor bug
+ * PHP7 Compatible
 
 = 1.2.1 =
  * WordPress 4 compatibility
