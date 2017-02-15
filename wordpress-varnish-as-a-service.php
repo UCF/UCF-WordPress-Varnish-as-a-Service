@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: WordPress Varnish as a Service
-Version: 1.2.2
+Version: 1.2.3
 Author: Joan Artés
 Author URI: http://joanartes.com/
 Plugin URI: http://joanartes.com/wordpress-varnish-as-a-service/
@@ -313,7 +313,7 @@ class WPVarnish {
 	function WPVarnishPurgeObject($wpv_url) {
 		global $varnish_servers;
 		$j=0;
-		if(get_option("wpvarnish_server_1")) {
+		if(get_option("wpvarnish_server")) {
 			$array_wpv_purgeaddr[$j] = get_option("wpvarnish_addr_1");
 			$array_wpv_purgeport[$j] = get_option("wpvarnish_port_1");
 			$array_wpv_secret[$j] = get_option("wpvarnish_secret_1");
@@ -348,7 +348,7 @@ class WPVarnish {
 			$wpv_use_adminport = $array_wpv_use_adminport[$i];
 			$wpv_use_version = $array_wpv_use_version[$i];
 			$wpv_wpurl = get_bloginfo('wpurl');
-			$wpv_replace_wpurl = '/^https?:\/\/([^\/]+)(.*)/i';
+			$wpv_replace_wpurl = '/^http:\/\/([^\/]+)(.*)/i';
 			$wpv_host = preg_replace($wpv_replace_wpurl, "$1", $wpv_wpurl);
 			$wpv_blogaddr = preg_replace($wpv_replace_wpurl, "$2", $wpv_wpurl);
 			$wpv_url = $wpv_blogaddr.$wpv_url;
@@ -381,17 +381,10 @@ class WPVarnish {
 						fwrite($varnish_sock, $out."\n");
 					}
 				} else {
-					if ($wpv_use_version == 3) {
-						$out = "BAN HTTP/1.0\r\n";
-						$out .= "X-Ban-Url: $wpv_url\r\n";
-						$out .= "X-Ban-Host: $wpv_host\r\n";
-						$out .= "Connection: Close\r\n\r\n";
-					} else {	
-						$out = "PURGE $wpv_url HTTP/1.0\r\n";
-						$out .= "Host: $wpv_host\r\n";
-						$out .= "Connection: Close\r\n\r\n";
-					}	
-					fwrite($varnish_sock, $out."\n");
+					$out = "PURGE $wpv_url HTTP/1.0\r\n";
+					$out .= "Host: $wpv_host\r\n";
+					$out .= "Connection: Close\r\n\r\n";
+					fwrite($varnish_sock, $out);
 				}
 				fclose($varnish_sock);
 			}
@@ -422,8 +415,8 @@ class WPVarnish {
 			$wpv_use_adminport = get_option("wpvarnish_use_adminport_3");
 			$wpv_use_version = get_option("wpvarnish_use_version_3");
 		}
-		$wpv_wpurl = get_bloginfo("wpurl");
-		$wpv_replace_wpurl = '/^https?:\/\/([^\/]+)(.*)/i';
+		$wpv_wpurl = get_bloginfo("url");
+		$wpv_replace_wpurl = '/^http:\/\/([^\/]+)(.*)/i';
 		$wpv_host = preg_replace($wpv_replace_wpurl, "$1", $wpv_wpurl);
 		$wpv_url = $wpv_blogaddr."/";
 		$varnish_test_conn .= "<ul>\n";
@@ -475,32 +468,16 @@ class WPVarnish {
 					}
 				}
 			} else {
-				if ($wpv_use_version == 3) {
-					$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - HTTP BAN",'wp-varnish-aas')."</span></li>\n";
-					$out = "BAN HTTP/1.0\r\n";
-					$out .= "X-Ban-Url: $wpv_url\r\n";
-					$out .= "X-Ban-Host: $wpv_host\r\n";
-					$out .= "Connection: Close\r\n\r\n";
-					fwrite($varnish_sock, $out."\n");
-					$buf = fread($varnish_sock, 256);
-					if(preg_match('/200/', $buf)) {
-						$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Cache flush",'wp-varnish-aas')."</span></li>\n";
-					} else {
-						$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Cache flush",'wp-varnish-aas')."</span><br><small>".__("Verify your Varnish version",'wp-varnish-aas')."</small></li>\n";
-					}
-
+				$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - HTTP Purge",'wp-varnish-aas')."</span></li>\n";
+				$out = "PURGE $wpv_url HTTP/1.0\r\n";
+				$out .= "Host: $wpv_host\r\n";
+				$out .= "Connection: Close\r\n\r\n";
+				fwrite($varnish_sock, $out);
+				$buf = fread($varnish_sock, 256);
+				if(preg_match('/200 OK/', $buf)) {
+					$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Request",'wp-varnish-aas')."</span></li>\n";
 				} else {
-					$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - HTTP Purge",'wp-varnish-aas')."</span></li>\n";
-					$out = "PURGE $wpv_url HTTP/1.0\r\n";
-					$out .= "Host: $wpv_host\r\n";
-					$out .= "Connection: Close\r\n\r\n";
-					fwrite($varnish_sock, $out);
-					$buf = fread($varnish_sock, 256);
-					if(preg_match('/200 OK/', $buf)) {
-						$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Request",'wp-varnish-aas')."</span></li>\n";
-					} else {
-						$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Request",'wp-varnish-aas')."</span></li>\n";
-					}
+					$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Request",'wp-varnish-aas')."</span></li>\n";
 				}
 			}
 			fclose($varnish_sock);
