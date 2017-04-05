@@ -496,7 +496,7 @@ class WPVarnish {
 					$out .= "Connection: Close\r\n\r\n";
 					fwrite($varnish_sock, $out);
 					$buf = fread($varnish_sock, 256);
-					if(preg_match('/200 OK/', $buf) || preg_match('/404/', $buf)) {
+					if(preg_match('/200 OK/', $buf)) {
 						$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Request",'wp-varnish-aas')."</span></li>\n";
 					} else {
 						$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Request",'wp-varnish-aas')."</span></li>\n";
