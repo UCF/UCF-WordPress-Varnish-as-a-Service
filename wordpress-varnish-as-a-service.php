@@ -2,10 +2,10 @@
 /*
 Plugin Name: UCF WordPress Varnish as a Service
 Version: 1.2.5
-Author: Joan Artés forked and modified by UCF
+Author: Joan Artés
 Author URI: http://joanartes.com/
-Plugin URI: https://github.com/UCF/WordPress-Varnish-as-a-Service/
-Description: A UCF modified plugin for purging and banning Varnish cache when content is published or edited. This is a fork of the original plugin modified for use with UCF Varnish http BAN method.
+Plugin URI: http://joanartes.com/wordpress-varnish-as-a-service/
+Description: A plugin for purging Varnish cache when content is published or edited. It works with HTTP purge and Admin Port purge. Works with Varnish 2 (PURGE) and Varnish 3 (BAN) versions. Based on WordPress Varnish and Plugin Varnish Purges.
 */
 class WPVarnish {
 	public $commenter;
