@@ -92,6 +92,9 @@ class WPVarnish {
 		add_action('deleted_comment', array(&$this, 'WPVarnishPurgePostComments'),99);
 		add_action('deleted_post', array(&$this, 'WPVarnishPurgePost'), 99);
 		add_action('deleted_post', array(&$this, 'WPVarnishPurgeCommonObjects'), 99);
+		add_action('add_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
+        add_action('edit_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
+        add_action('delete_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
 		add_filter('wp_get_current_commenter', array(&$this, "wp_get_current_commenter_varnish"));
 	}
 	function wp_get_current_commenter_varnish($commenter) {
@@ -125,6 +128,16 @@ class WPVarnish {
 		if ($wpv_commentapproved == 1 || $wpv_commentapproved == 'trash') {
 			$wpv_postid = $comment->comment_post_ID;
 			$this->WPVarnishPurgeObject('comments_popup='.$wpv_postid);
+		}
+	}
+	function WPVarnishPurgeAttachment($wpv_attachmentid) {
+		$wpv_url = wp_get_attachment_url($wpv_attachmentid);
+		if ($wpv_url) {
+			// Handle removing all variants of the media file (i.e. image-100x100.jpg)
+			$wpv_parsed_media_url = parse_url($wpv_url);
+			$wpv_path_parts = pathinfo($wpv_parsed_media_url['path']);
+			$wpv_ban_url = $wpv_path_parts['dirname'] . '/' . $wpv_path_parts['filename'] . '.*\.' . $wpv_path_parts['extension'];
+			$this->WPVarnishPurgeObject($wpv_ban_url);
 		}
 	}
 	function WPVarnishAdminMenu() {
