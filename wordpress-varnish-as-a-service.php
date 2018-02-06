@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: UCF WordPress Varnish as a Service
-Version: 1.2.5
+Version: 1.2.6
 Author: Joan Artés
 Author URI: http://joanartes.com/
 Plugin URI: http://joanartes.com/wordpress-varnish-as-a-service/
@@ -399,11 +399,11 @@ class WPVarnish {
 						$out .= "X-Ban-Url: $wpv_url\r\n";
 						$out .= "X-Ban-Host: $wpv_host\r\n";
 						$out .= "Connection: Close\r\n\r\n";
-					} else {	
+					} else {
 						$out = "PURGE $wpv_url HTTP/1.0\r\n";
 						$out .= "Host: $wpv_host\r\n";
 						$out .= "Connection: Close\r\n\r\n";
-					}	
+					}
 					fwrite($varnish_sock, $out."\n");
 				}
 				fclose($varnish_sock);
