@@ -27,6 +27,9 @@ Based on <a href="http://wordpress.org/extend/plugins/wordpress-varnish/">WordPr
 
 == Changelog ==
 
+= 1.2.6 =
+ * Added support for attachment bans on create/update/delete.
+
 = 1.2.3 =
  * Minor update
 

@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: UCF WordPress Varnish as a Service
-Version: 1.2.5
+Version: 1.2.6
 Author: Joan Artés
 Author URI: http://joanartes.com/
 Plugin URI: http://joanartes.com/wordpress-varnish-as-a-service/
@@ -51,7 +51,7 @@ class WPVarnish {
 		if(!get_option("wpvarnish_server_1"))
 			add_option("wpvarnish_server_1", $wpv_server_optval_1, '', 'yes');
 
-    if(!get_option("wpvarnish_addr_2"))
+	if(!get_option("wpvarnish_addr_2"))
 			add_option("wpvarnish_addr_2", $wpv_addr_optval_2, '', 'yes');
 		if(!get_option("wpvarnish_port_2"))
 			add_option("wpvarnish_port_2", $wpv_port_optval_2, '', 'yes');
@@ -81,7 +81,7 @@ class WPVarnish {
 		if(!get_option("wpvarnish_server_3"))
 			add_option("wpvarnish_server_3", $wpv_server_optval_3, '', 'yes');
 
-    add_action('init', array(&$this, 'WPVarnishLocalization'));
+	add_action('init', array(&$this, 'WPVarnishLocalization'));
 		add_action('admin_menu', array(&$this, 'WPVarnishAdminMenu'));
 		add_action('edit_post', array(&$this, 'WPVarnishPurgePost'), 99);
 		add_action('edit_post', array(&$this, 'WPVarnishPurgeCommonObjects'), 99);
@@ -93,8 +93,8 @@ class WPVarnish {
 		add_action('deleted_post', array(&$this, 'WPVarnishPurgePost'), 99);
 		add_action('deleted_post', array(&$this, 'WPVarnishPurgeCommonObjects'), 99);
 		add_action('add_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
-        add_action('edit_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
-        add_action('delete_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
+		add_action('edit_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
+		add_action('delete_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
 		add_filter('wp_get_current_commenter', array(&$this, "wp_get_current_commenter_varnish"));
 	}
 	function wp_get_current_commenter_varnish($commenter) {
@@ -399,11 +399,11 @@ class WPVarnish {
 						$out .= "X-Ban-Url: $wpv_url\r\n";
 						$out .= "X-Ban-Host: $wpv_host\r\n";
 						$out .= "Connection: Close\r\n\r\n";
-					} else {	
+					} else {
 						$out = "PURGE $wpv_url HTTP/1.0\r\n";
 						$out .= "Host: $wpv_host\r\n";
 						$out .= "Connection: Close\r\n\r\n";
-					}	
+					}
 					fwrite($varnish_sock, $out."\n");
 				}
 				fclose($varnish_sock);
