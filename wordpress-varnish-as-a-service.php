@@ -5,6 +5,7 @@ Version: 1.2.6
 Author: Joan Artés
 Author URI: http://joanartes.com/
 Plugin URI: http://joanartes.com/wordpress-varnish-as-a-service/
+GitHub Plugin URI: https://github.com/UCF/UCF-WordPress-Varnish-as-a-Service 
 Description: A plugin for purging Varnish cache when content is published or edited. It works with HTTP purge and Admin Port purge. Works with Varnish 2 (PURGE) and Varnish 3 (BAN) versions. Based on WordPress Varnish and Plugin Varnish Purges.
 */
 class WPVarnish {
