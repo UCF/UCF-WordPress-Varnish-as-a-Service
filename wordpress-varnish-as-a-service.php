@@ -143,7 +143,7 @@ class WPVarnish {
 		}
 	}
 	function WPVarnishAdminMenu() {
-		add_options_page(__('Varnish as a Service Configuration','wp-varnish-aas'), 'Varnish aaS', 1, 'WPVarnish', array(&$this, 'WPVarnishAdmin'));
+		add_options_page(__('Varnish as a Service Configuration','wp-varnish-aas'), 'Varnish aaS', 'activate_plugins', 'WPVarnish', array(&$this, 'WPVarnishAdmin'));
 	}
 	function WPVarnishAdmin() {
 		if(current_user_can('administrator')) {
