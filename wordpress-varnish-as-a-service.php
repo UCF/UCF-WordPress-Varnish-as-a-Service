@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: UCF WordPress Varnish as a Service
-Version: 1.2.9
+Version: 1.2.10
 Author: Joan Artés
 Author URI: http://joanartes.com/
 Plugin URI: http://joanartes.com/wordpress-varnish-as-a-service/
@@ -143,7 +143,7 @@ class WPVarnish {
 		}
 	}
 	function WPVarnishAdminMenu() {
-		add_options_page(__('Varnish as a Service Configuration','wp-varnish-aas'), 'Varnish aaS', 1, 'WPVarnish', array(&$this, 'WPVarnishAdmin'));
+		add_options_page(__('Varnish as a Service Configuration','wp-varnish-aas'), 'Varnish aaS', 'activate_plugins', 'WPVarnish', array(&$this, 'WPVarnishAdmin'));
 	}
 	function WPVarnishAdmin() {
 		if(current_user_can('administrator')) {
