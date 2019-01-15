@@ -2,7 +2,7 @@
 Contributors: jartes, JavierCasares
 Tags: varnish, cache, purge, ban
 Requires at least: 2.5
-Tested up to: 4.7.2
+Tested up to: 4.9.5
 Stable tag: 1.2.3
 
 Clear your Varnish cache when new, edited or deleted content happens.
@@ -21,11 +21,18 @@ Based on <a href="http://wordpress.org/extend/plugins/wordpress-varnish/">WordPr
 2. Activate the plugin through the `Plugins` menu in WordPress
 3. Configure your Varnish IP server and port. Also your Secret Key and Varnish version if you use Admin Port.
 
+
 == Screenshots ==
 
 1. Configuration.
 
 == Changelog ==
+
+= 1.2.10 =
+ * Remove deprecated has_cap warnings with debug on.
+
+= 1.2.7 =
+ * Added Github URI for Github Updater plugin usage.
 
 = 1.2.6 =
  * Added support for attachment bans on create/update/delete.
