@@ -28,6 +28,9 @@ Based on <a href="http://wordpress.org/extend/plugins/wordpress-varnish/">WordPr
 
 == Changelog ==
 
+= 1.2.11 =
+ * Fix PHP7+ deprecated warnings on constructor name.
+
 = 1.2.10 =
  * Remove deprecated has_cap warnings with debug on.
 
