@@ -1,17 +1,23 @@
 <?php
 /*
 Plugin Name: UCF WordPress Varnish as a Service
-Version: 1.2.10
+Version: 1.2.11
 Author: Joan Artés
 Author URI: http://joanartes.com/
 Plugin URI: http://joanartes.com/wordpress-varnish-as-a-service/
-GitHub Plugin URI: UCF/UCF-WordPress-Varnish-as-a-Service 
-GitHub Plugin URI: https://github.com/UCF/UCF-WordPress-Varnish-as-a-Service 
+GitHub Plugin URI: UCF/UCF-WordPress-Varnish-as-a-Service
+GitHub Plugin URI: https://github.com/UCF/UCF-WordPress-Varnish-as-a-Service
 Description: A plugin for purging Varnish cache when content is published or edited. It works with HTTP purge and Admin Port purge. Works with Varnish 2 (PURGE) and Varnish 3 (BAN) versions. Based on WordPress Varnish and Plugin Varnish Purges.
 */
 class WPVarnish {
 	public $commenter;
-	function WPVarnish() {
+	/**
+	 * __construct
+	 * Set default values and options for plugin.
+	 * Should be backward compatible back to PHP4.
+	 * @since v2.0.0
+	 **/
+	function __construct() {
 		global $post;
 
 		$wpv_addr_optval_1 = "127.0.0.1";
@@ -53,7 +59,7 @@ class WPVarnish {
 		if(!get_option("wpvarnish_server_1"))
 			add_option("wpvarnish_server_1", $wpv_server_optval_1, '', 'yes');
 
-	if(!get_option("wpvarnish_addr_2"))
+		if(!get_option("wpvarnish_addr_2"))
 			add_option("wpvarnish_addr_2", $wpv_addr_optval_2, '', 'yes');
 		if(!get_option("wpvarnish_port_2"))
 			add_option("wpvarnish_port_2", $wpv_port_optval_2, '', 'yes');
@@ -528,4 +534,5 @@ class WPVarnish {
 <?php
 	}
 }
-$wpvarnish = new WPVarnish();
+
+new WPVarnish();
