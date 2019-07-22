@@ -9,87 +9,52 @@ GitHub Plugin URI: UCF/UCF-WordPress-Varnish-as-a-Service
 GitHub Plugin URI: https://github.com/UCF/UCF-WordPress-Varnish-as-a-Service
 Description: A plugin for purging Varnish cache when content is published or edited. It works with HTTP purge and Admin Port purge. Works with Varnish 2 (PURGE) and Varnish 3 (BAN) versions. Based on WordPress Varnish and Plugin Varnish Purges.
 */
-class WPVarnish {
+class WVaas {
 	public $commenter;
+	public $post;
+
+	$wpv_addr_optval_1 = "127.0.0.1";
+	$wpv_port_optval_1 = "80";
+	$wpv_secret_optval_1 = "";
+	$wpv_timeout_optval_1 = 5;
+	$wpv_use_adminport_optval_1 = 0;
+	$wpv_use_version_optval_1 = 3;
+	$wpv_server_optval_1 = 0;
+
+	$wpv_addr_optval_2 = "127.0.0.1";
+	$wpv_port_optval_2 = "80";
+	$wpv_secret_optval_2 = "";
+	$wpv_timeout_optval_2 = 5;
+	$wpv_use_adminport_optval_2 = 0;
+	$wpv_use_version_optval_2 = 3;
+	$wpv_server_optval_2 = 0;
+
+	$wpv_addr_optval_3 = "127.0.0.1";
+	$wpv_port_optval_3 = "80";
+	$wpv_secret_optval_3 = "";
+	$wpv_timeout_optval_3 = 5;
+	$wpv_use_adminport_optval_3 = 0;
+	$wpv_use_version_optval_3 = 3;
+	$wpv_server_optval_3 = 0;
+
 	/**
 	 * __construct
 	 * Set default values and options for plugin.
 	 * Should be backward compatible back to PHP4.
 	 * @since v2.0.0
 	 **/
-	function __construct() {
-		global $post;
+	public function __construct() {
+		// Makes sure the plugin is defined before trying to use it
+		if ( !function_exists( 'is_plugin_active_for_network' ) ) {
+			require_once ABSPATH . '/wp-admin/includes/plugin.php';
+		}
+		$hook = ( is_multisite() && is_plugin_active_for_network( plugin_basename( __FILE__ ) ) ) ? 'network_' : '';
+		add_action( "{$hook}admin_menu", function() { new WPVarnishSettings(); } );
 
-		$wpv_addr_optval_1 = "127.0.0.1";
-		$wpv_port_optval_1 = "80";
-		$wpv_secret_optval_1 = "";
-		$wpv_timeout_optval_1 = 5;
-		$wpv_use_adminport_optval_1 = 0;
-		$wpv_use_version_optval_1 = 3;
-		$wpv_server_optval_1 = 0;
+		register_activation_hook( __FILE__, array( $this, 'activate' ) );
+		register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
 
-		$wpv_addr_optval_2 = "127.0.0.1";
-		$wpv_port_optval_2 = "80";
-		$wpv_secret_optval_2 = "";
-		$wpv_timeout_optval_2 = 5;
-		$wpv_use_adminport_optval_2 = 0;
-		$wpv_use_version_optval_2 = 3;
-		$wpv_server_optval_2 = 0;
-
-		$wpv_addr_optval_3 = "127.0.0.1";
-		$wpv_port_optval_3 = "80";
-		$wpv_secret_optval_3 = "";
-		$wpv_timeout_optval_3 = 5;
-		$wpv_use_adminport_optval_3 = 0;
-		$wpv_use_version_optval_3 = 3;
-		$wpv_server_optval_3 = 0;
-
-		if(!get_option("wpvarnish_addr_1"))
-			add_option("wpvarnish_addr_1", $wpv_addr_optval_1, '', 'yes');
-		if(!get_option("wpvarnish_port_1"))
-			add_option("wpvarnish_port_1", $wpv_port_optval_1, '', 'yes');
-		if(!get_option("wpvarnish_secret_1"))
-			add_option("wpvarnish_secret_1", $wpv_secret_optval_1, '', 'yes');
-		if(!get_option("wpvarnish_timeout_1"))
-			add_option("wpvarnish_timeout_1", $wpv_timeout_optval_1, '', 'yes');
-		if(!get_option("wpvarnish_use_version_1"))
-			add_option("wpvarnish_use_version_1", $wpv_use_version_optval_1, '', 'yes');
-		if(!get_option("wpvarnish_use_adminport_1"))
-			add_option("wpvarnish_use_adminport_1", $wpv_use_adminport_optval_1, '', 'yes');
-		if(!get_option("wpvarnish_server_1"))
-			add_option("wpvarnish_server_1", $wpv_server_optval_1, '', 'yes');
-
-		if(!get_option("wpvarnish_addr_2"))
-			add_option("wpvarnish_addr_2", $wpv_addr_optval_2, '', 'yes');
-		if(!get_option("wpvarnish_port_2"))
-			add_option("wpvarnish_port_2", $wpv_port_optval_2, '', 'yes');
-		if(!get_option("wpvarnish_secret_2"))
-			add_option("wpvarnish_secret_2", $wpv_secret_optval_2, '', 'yes');
-		if(!get_option("wpvarnish_timeout_2"))
-			add_option("wpvarnish_timeout_2", $wpv_timeout_optval_2, '', 'yes');
-		if(!get_option("wpvarnish_use_version_2"))
-			add_option("wpvarnish_use_version_2", $wpv_use_version_optval_2, '', 'yes');
-		if(!get_option("wpvarnish_use_adminport_2"))
-			add_option("wpvarnish_use_adminport_2", $wpv_use_adminport_optval_2, '', 'yes');
-		if(!get_option("wpvarnish_server_2"))
-			add_option("wpvarnish_server_2", $wpv_server_optval_2, '', 'yes');
-
-		if(!get_option("wpvarnish_addr_3"))
-			add_option("wpvarnish_addr_3", $wpv_addr_optval_3, '', 'yes');
-		if(!get_option("wpvarnish_port_3"))
-			add_option("wpvarnish_port_3", $wpv_port_optval_3, '', 'yes');
-		if(!get_option("wpvarnish_secret_3"))
-			add_option("wpvarnish_secret_3", $wpv_secret_optval_3, '', 'yes');
-		if(!get_option("wpvarnish_timeout_3"))
-			add_option("wpvarnish_timeout_3", $wpv_timeout_optval_3, '', 'yes');
-		if(!get_option("wpvarnish_use_version_3"))
-			add_option("wpvarnish_use_version_3", $wpv_use_version_optval_3, '', 'yes');
-		if(!get_option("wpvarnish_use_adminport_3"))
-			add_option("wpvarnish_use_adminport_3", $wpv_use_adminport_optval_3, '', 'yes');
-		if(!get_option("wpvarnish_server_3"))
-			add_option("wpvarnish_server_3", $wpv_server_optval_3, '', 'yes');
-
-	add_action('init', array(&$this, 'WPVarnishLocalization'));
+		add_action('init', array(&$this, 'WPVarnishLocalization'));
 		add_action('admin_menu', array(&$this, 'WPVarnishAdminMenu'));
 		add_action('edit_post', array(&$this, 'WPVarnishPurgePost'), 99);
 		add_action('edit_post', array(&$this, 'WPVarnishPurgeCommonObjects'), 99);
@@ -104,6 +69,154 @@ class WPVarnish {
 		add_action('edit_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
 		add_action('delete_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
 		add_filter('wp_get_current_commenter', array(&$this, "wp_get_current_commenter_varnish"));
+	}
+
+
+
+	function activate() {
+		if ( is_multisite() && isset( $_GET['networkwide'] ) && 1 == $_GET['networkwide'] ) {
+			if(!get_site_option("wpvarnish_addr_1"))
+				add_option("wpvarnish_addr_1", $wpv_addr_optval_1, '', 'yes');
+			if(!get_site_option("wpvarnish_port_1"))
+				add_site_option("wpvarnish_port_1", $wpv_port_optval_1, '', 'yes');
+			if(!get_site_option("wpvarnish_secret_1"))
+				add_site_option("wpvarnish_secret_1", $wpv_secret_optval_1, '', 'yes');
+			if(!get_site_option("wpvarnish_timeout_1"))
+				add_site_option("wpvarnish_timeout_1", $wpv_timeout_optval_1, '', 'yes');
+			if(!get_site_option("wpvarnish_use_version_1"))
+				add_site_option("wpvarnish_use_version_1", $wpv_use_version_optval_1, '', 'yes');
+			if(!get_site_option("wpvarnish_use_adminport_1"))
+				add_site_option("wpvarnish_use_adminport_1", $wpv_use_adminport_optval_1, '', 'yes');
+			if(!get_site_option("wpvarnish_server_1"))
+				add_site_option("wpvarnish_server_1", $wpv_server_optval_1, '', 'yes');
+
+			if(!get_site_option("wpvarnish_addr_2"))
+				add_site_option("wpvarnish_addr_2", $wpv_addr_optval_2, '', 'yes');
+			if(!get_site_option("wpvarnish_port_2"))
+				add_site_option("wpvarnish_port_2", $wpv_port_optval_2, '', 'yes');
+			if(!get_site_option("wpvarnish_secret_2"))
+				add_site_option("wpvarnish_secret_2", $wpv_secret_optval_2, '', 'yes');
+			if(!get_site_option("wpvarnish_timeout_2"))
+				add_site_option("wpvarnish_timeout_2", $wpv_timeout_optval_2, '', 'yes');
+			if(!get_site_option("wpvarnish_use_version_2"))
+				add_site_option("wpvarnish_use_version_2", $wpv_use_version_optval_2, '', 'yes');
+			if(!get_site_option("wpvarnish_use_adminport_2"))
+				add_site_option("wpvarnish_use_adminport_2", $wpv_use_adminport_optval_2, '', 'yes');
+			if(!get_site_option("wpvarnish_server_2"))
+				add_site_option("wpvarnish_server_2", $wpv_server_optval_2, '', 'yes');
+
+			if(!get_site_option("wpvarnish_addr_3"))
+				add_site_option("wpvarnish_addr_3", $wpv_addr_optval_3, '', 'yes');
+			if(!get_site_option("wpvarnish_port_3"))
+				add_site_option("wpvarnish_port_3", $wpv_port_optval_3, '', 'yes');
+			if(!get_site_option("wpvarnish_secret_3"))
+				add_site_option("wpvarnish_secret_3", $wpv_secret_optval_3, '', 'yes');
+			if(!get_site_option("wpvarnish_timeout_3"))
+				add_site_option("wpvarnish_timeout_3", $wpv_timeout_optval_3, '', 'yes');
+			if(!get_site_option("wpvarnish_use_version_3"))
+				add_site_option("wpvarnish_use_version_3", $wpv_use_version_optval_3, '', 'yes');
+			if(!get_site_option("wpvarnish_use_adminport_3"))
+				add_site_option("wpvarnish_use_adminport_3", $wpv_use_adminport_optval_3, '', 'yes');
+			if(!get_site_option("wpvarnish_server_3"))
+				add_site_option("wpvarnish_server_3", $wpv_server_optval_3, '', 'yes');
+		} else {
+			if(!get_option("wpvarnish_addr_1"))
+			add_option("wpvarnish_addr_1", $wpv_addr_optval_1, '', 'yes');
+			if(!get_option("wpvarnish_port_1"))
+				add_option("wpvarnish_port_1", $wpv_port_optval_1, '', 'yes');
+			if(!get_option("wpvarnish_secret_1"))
+				add_option("wpvarnish_secret_1", $wpv_secret_optval_1, '', 'yes');
+			if(!get_option("wpvarnish_timeout_1"))
+				add_option("wpvarnish_timeout_1", $wpv_timeout_optval_1, '', 'yes');
+			if(!get_option("wpvarnish_use_version_1"))
+				add_option("wpvarnish_use_version_1", $wpv_use_version_optval_1, '', 'yes');
+			if(!get_option("wpvarnish_use_adminport_1"))
+				add_option("wpvarnish_use_adminport_1", $wpv_use_adminport_optval_1, '', 'yes');
+			if(!get_option("wpvarnish_server_1"))
+				add_option("wpvarnish_server_1", $wpv_server_optval_1, '', 'yes');
+
+			if(!get_option("wpvarnish_addr_2"))
+				add_option("wpvarnish_addr_2", $wpv_addr_optval_2, '', 'yes');
+			if(!get_option("wpvarnish_port_2"))
+				add_option("wpvarnish_port_2", $wpv_port_optval_2, '', 'yes');
+			if(!get_option("wpvarnish_secret_2"))
+				add_option("wpvarnish_secret_2", $wpv_secret_optval_2, '', 'yes');
+			if(!get_option("wpvarnish_timeout_2"))
+				add_option("wpvarnish_timeout_2", $wpv_timeout_optval_2, '', 'yes');
+			if(!get_option("wpvarnish_use_version_2"))
+				add_option("wpvarnish_use_version_2", $wpv_use_version_optval_2, '', 'yes');
+			if(!get_option("wpvarnish_use_adminport_2"))
+				add_option("wpvarnish_use_adminport_2", $wpv_use_adminport_optval_2, '', 'yes');
+			if(!get_option("wpvarnish_server_2"))
+				add_option("wpvarnish_server_2", $wpv_server_optval_2, '', 'yes');
+
+			if(!get_option("wpvarnish_addr_3"))
+				add_option("wpvarnish_addr_3", $wpv_addr_optval_3, '', 'yes');
+			if(!get_option("wpvarnish_port_3"))
+				add_option("wpvarnish_port_3", $wpv_port_optval_3, '', 'yes');
+			if(!get_option("wpvarnish_secret_3"))
+				add_option("wpvarnish_secret_3", $wpv_secret_optval_3, '', 'yes');
+			if(!get_option("wpvarnish_timeout_3"))
+				add_option("wpvarnish_timeout_3", $wpv_timeout_optval_3, '', 'yes');
+			if(!get_option("wpvarnish_use_version_3"))
+				add_option("wpvarnish_use_version_3", $wpv_use_version_optval_3, '', 'yes');
+			if(!get_option("wpvarnish_use_adminport_3"))
+				add_option("wpvarnish_use_adminport_3", $wpv_use_adminport_optval_3, '', 'yes');
+			if(!get_option("wpvarnish_server_3"))
+				add_option("wpvarnish_server_3", $wpv_server_optval_3, '', 'yes');
+		}
+	}
+
+	function deactivate() {
+		if ( is_multisite() && is_plugin_active_for_network( plugin_basename( __FILE__ ) ) ) {
+			delete_site_option("wpvarnish_addr_1");
+			delete_site_option("wpvarnish_port_1");
+			delete_site_option("wpvarnish_secret_1");
+			delete_site_option("wpvarnish_timeout_1");
+			delete_site_option("wpvarnish_use_version_1");
+			delete_site_option("wpvarnish_use_adminport_1");
+			delete_site_option("wpvarnish_server_1");
+
+			delete_site_option("wpvarnish_addr_2");
+			delete_site_option("wpvarnish_port_2");
+			delete_site_option("wpvarnish_secret_2");
+			delete_site_option("wpvarnish_timeout_2");
+			delete_site_option("wpvarnish_use_version_2");
+			delete_site_option("wpvarnish_use_adminport_2");
+			delete_site_option("wpvarnish_server_2");
+
+			delete_site_option("wpvarnish_addr_3");
+			delete_site_option("wpvarnish_port_3");
+			delete_site_option("wpvarnish_secret_3");
+			delete_site_option("wpvarnish_timeout_3");
+			delete_site_option("wpvarnish_use_version_3");
+			delete_site_option("wpvarnish_use_adminport_3");
+			delete_site_option("wpvarnish_server_3");
+		} else {
+			delete_option("wpvarnish_addr_1");
+			delete_option("wpvarnish_port_1");
+			delete_option("wpvarnish_secret_1");
+			delete_option("wpvarnish_timeout_1");
+			delete_option("wpvarnish_use_version_1");
+			delete_option("wpvarnish_use_adminport_1");
+			delete_option("wpvarnish_server_1");
+
+			delete_option("wpvarnish_addr_2");
+			delete_option("wpvarnish_port_2");
+			delete_option("wpvarnish_secret_2");
+			delete_option("wpvarnish_timeout_2");
+			delete_option("wpvarnish_use_version_2");
+			delete_option("wpvarnish_use_adminport_2");
+			delete_option("wpvarnish_server_2");
+
+			delete_option("wpvarnish_addr_3");
+			delete_option("wpvarnish_port_3");
+			delete_option("wpvarnish_secret_3");
+			delete_option("wpvarnish_timeout_3");
+			delete_option("wpvarnish_use_version_3");
+			delete_option("wpvarnish_use_adminport_3");
+			delete_option("wpvarnish_server_3");
+		}
 	}
 	function wp_get_current_commenter_varnish($commenter) {
 		if (get_query_var($this->query)) {
@@ -209,6 +322,7 @@ class WPVarnish {
 						update_option("wpvarnish_server_3", 1);
 					else
 						update_option("wpvarnish_server_3", 0);
+
 ?>
 	<div class="updated"><p><?php echo __('Settings Saved!','wp-varnish-aas'); ?></p></div>
 <?php
@@ -535,4 +649,122 @@ class WPVarnish {
 	}
 }
 
-new WPVarnish();
+class WVaasSettings{
+	public
+	$page_title = 'WordPress Varnish as a Service Settings',
+	$menu_title = 'WordPress Varnish as a Service',
+	$capability = 'manage_options',
+	$menu_slug  = 'wvaas-settings-page',
+	$file_name  = 'options.php';
+
+	public function __construct() {
+		if ( is_multisite() && is_plugin_active_for_network( plugin_basename( __FILE__ ) ) ) {
+			add_submenu_page(
+				'settings.php',
+				$this->page_title,
+				$this->menu_title,
+				$this->capability,
+				$this->menu_slug,
+				array( $this, 'settings_page' )
+			);
+		} else {
+			add_options_page(
+				$this->page_title,
+				$this->menu_title,
+				$this->capability,
+				$this->menu_slug,
+				array( $this, 'settings_page' )
+			);
+		}
+
+		add_action( 'admin_init', array( $this, 'register_settings' ) );
+
+	}
+
+	public function settings_page() {
+		if ( !current_user_can( 'manage_options' ) ) {
+			wp_die( __( 'You do not have permission to access this page.' ) );
+		}
+
+		// Save options manually only for multisite. POST action to options.php
+		// in display_options_page will save the setting for individual websites
+		if ( is_multisite()
+			&& is_plugin_active_for_network( plugin_basename( __FILE__ ) )
+			&& isset( $_POST['submit'] )
+			&& isset( $_POST['_wpnonce'] )
+			&& wp_verify_nonce( $_POST['_wpnonce'], 'wvaas-update' )
+		) {
+			// Remove slashes added by PHP or by WordPress
+			$allowed_hosts = ( !get_magic_quotes_gpc() && !function_exists( 'wp_magic_quotes' ) ) ? $_POST['allowed-hosts'] : stripslashes( $_POST['allowed-hosts'] );
+			$allowed_hosts_regex = (int)$_POST['allowed-hosts-regex'];
+
+			// Update values.  Return whether or not the value in the db changed.
+			$allowed_hosts_changed = update_site_option( AH::$ALLOWED_HOSTS_NAME, $allowed_hosts );
+			$allowed_hosts_regex_changed = update_site_option( AH::$ALLOWED_HOSTS_REGEX_NAME, $allowed_hosts_regex );
+
+			// If the value in the db changed for any field, display a success message
+			if ( $allowed_hosts_changed || $allowed_hosts_regex_changed ) {
+				echo '<div class="updated"><p>' . __( 'Settings saved.' ) . '</p></div>';
+			}
+		}
+
+		$this->display_options_page();
+	}
+
+	public function display_options_page() {
+		if ( !current_user_can( 'manage_options' ) ) {
+			wp_die( __( 'You do not have permission to access this page.' ) );
+		}
+
+		$allowed_hosts = '';
+		$allowed_hosts_regex = '';
+		$post_action = '';
+		if ( is_multisite() && is_plugin_active_for_network( plugin_basename( __FILE__ ) ) ) {
+			$allowed_hosts = get_site_option( 'allowed-hosts' );
+			$allowed_hosts_regex = get_site_option( 'allowed-hosts-regex' );
+		} else {
+			$allowed_hosts = get_option( 'allowed-hosts' );
+			$allowed_hosts_regex = get_option( 'allowed-hosts-regex' );
+			$post_action = 'action="options.php"';
+		}
+
+		ob_start();
+		?>
+			<div class="wrap">
+				<h2>Allowed Hosts</h2>
+				<form method="post" <?php echo $post_action; ?>>
+				<?php ( is_multisite() && is_plugin_active_for_network( plugin_basename( __FILE__ ) ) ) ? wp_nonce_field( 'allow-hosts-update' ) : settings_fields( 'ah-settings-group' ); ?>
+					<table class="form-table">
+						<tr valign="top">
+							<th scope="row">Hosts</th>
+							<td>
+								<textarea name="allowed-hosts"><?php echo $allowed_hosts; ?></textarea>
+								<br><br>
+								<input type="checkbox" name="allowed-hosts-regex" id="allowed-hosts-regex" value="1" <?php checked( $allowed_hosts_regex ); ?> />
+								<label for="allowed-hosts-regex">Compare hosts using regular expressions</label>
+								<br><br>
+								<p class="description">
+									Enter domain names that this WordPress instance needs to communicate with. Separate
+									multiple domains by commas. Delimiters are not needed for regular expressions since
+									they are put in for you ('/'). For information about regular expressions please go to
+									<a href="http://www.regular-expressions.info">http://www.regular-expressions.info</a>.
+								</p>
+							</td>
+						</tr>
+					</table>
+					<?php submit_button(); ?>
+				</form>
+			</div>
+		<?php
+		echo ob_get_clean();
+	}
+
+	public function register_settings() {
+		register_setting( 'wvaas-settings-group', 'allowed-hosts' );
+		register_setting( 'ah-settings-group', 'allowed-hosts-regex' );
+	}
+
+}
+
+$varnish = new WVaas();
+?>
