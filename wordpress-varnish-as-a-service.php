@@ -13,22 +13,10 @@ if ( ! defined( 'WPINC' ) ) {
     die;
 }
 
-if ( version_compare( phpversion(), '5.6', '<=' ) ) {
-	echo '<div class="error notice is-dismissible"><p>';
-	printf(
-		/* translators: 1: minimum PHP version required, 2: Upgrade PHP URL */
-		wp_kses_post( __( 'UCF WordPress Varnish as a service cannot run on PHP versions older than %1$s. <a href="%2$s">Learn about updating your PHP.</a>', 'UCF-WordPress-Varnish-as-a-Service' ) ),
-		'5.6',
-		esc_url( __( 'https://wordpress.org/support/update-php/' ) )
-	);
-	echo '</p></div>';
-	return false;
-}
-
 class WPVarnish {
 	public $commenter;
-	protected $is_multisite=false;
-	protected $is_network_activated=false;
+	public $is_multisite=false;
+	public $is_network_activated=false;
 
 	/**
 	 * __construct
@@ -45,23 +33,22 @@ class WPVarnish {
 			// Makes sure the plugin is defined before trying to use it
 			require_once ABSPATH . '/wp-admin/includes/plugin.php';
 		}
-		if ( is_multisite() && isset( $_GET['networkwide'] ) && 1 == $_GET['networkwide'] ) {
+		if ( is_multisite() ) {
 			$this->is_multisite=true;
 		}
 		else {
 			$this->is_multisite=false;
 		}
 		if ( is_multisite() && is_plugin_active_for_network( plugin_basename( __FILE__ ) ) ) {
-			$this->is_multisite=true;
+			$this->is_network_activated=true;
+			add_action('network_admin_menu', array(&$this, 'WPVarnishAdminMenu'));
 		}
 		else {
-			$this->is_multisite=false;
+			$this->is_network_activated=false;
+			add_action('admin_menu', array(&$this, 'WPVarnishAdminMenu'));
 		}
-		echo($this->is_multisite);
-		echo($this->is_network_activated);
-		add_action('admin_menu', array(&$this, 'WPVarnishAdminMenu'));
-		register_activation_hook( __FILE__, array( $this, 'activate' ) );
-		register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
+		register_activation_hook( __FILE__, array( &$this, 'activate' ) );
+		register_deactivation_hook( __FILE__, array( &$this, 'deactivate' ) );
 		add_action('init', array(&$this, 'WPVarnishLocalization'));
 		add_action('edit_post', array(&$this, 'WPVarnishPurgePost'), 99);
 		add_action('edit_post', array(&$this, 'WPVarnishPurgeCommonObjects'), 99);
@@ -310,16 +297,15 @@ class WPVarnish {
 			$this->WPVarnishPurgeObject($wpv_ban_url);
 		}
 	}
-	function WPVarnishAdminMenu($is_network_activated) {
+	function WPVarnishAdminMenu() {
 		$page_title = 'Varnish as a Service Configuration';
 		$menu_title = 'Varnish aaS';
-		$capability = 'activate_plugins';
 		$menu_slug  = 'WPVarnish';
 		$file_name  = 'options.php';
-		if ($is_network_activated) {
-			add_submenu_page('settings.php', $page_title, $menu_title, $capability, $menu_slug, array(&$this, 'WPVarnishAdmin'));
+		if($this->is_network_activated == true) {
+			add_submenu_page('settings.php', $page_title, $menu_title, 'manage_network', $menu_slug, array(&$this, 'WPVarnishAdmin'));
 		} else {
-			add_options_page($page_title, $menu_title, $capability, $menu_slug, array(&$this, 'WPVarnishAdmin'));
+			add_options_page($page_title, $menu_title, 'manage_options', $menu_slug, array(&$this, 'WPVarnishAdmin'));
 		}
 	}
 	function WPVarnishAdmin() {
