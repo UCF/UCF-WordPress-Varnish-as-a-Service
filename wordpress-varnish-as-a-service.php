@@ -377,7 +377,7 @@ class WPVarnish {
 			<div class="wrap">
 				<h2><?php echo __("Varnish as a Service Administration",$this->plugin_group); ?></h2>
 				<form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
-				<?php if((strpos($_SERVER['REQUEST_URI'], 'network') !=== false) || ($this->is_multisite === false)){ ?>
+				<?php if((strpos($_SERVER['REQUEST_URI'], 'network') !== false) || ($this->is_multisite === false)){ ?>
 				<table width="100%">
 					<tr valign="top">
 						<td>
