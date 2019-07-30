@@ -42,7 +42,7 @@ class WPVarnish {
 		add_action('admin_menu', array(&$this, 'WPVarnishAdminMenu'));
 		register_activation_hook( __FILE__, array( &$this, 'activate' ) );
 		register_deactivation_hook( __FILE__, array( &$this, 'deactivate' ) );
-		add_action('init', array(&$this, 'WPVarnishLocalization'));
+		add_action('admin_init', array(&$this, 'WPVarnishLocalization'));
 		add_action('edit_post', array(&$this, 'WPVarnishPurgePost'), 99);
 		add_action('edit_post', array(&$this, 'WPVarnishPurgeCommonObjects'), 99);
 		add_action('comment_post', array(&$this, 'WPVarnishPurgePostComments'),99);
