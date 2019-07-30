@@ -65,7 +65,7 @@ class WPVarnish {
 	}
 	// Wordpress function 'get_site_option' and 'get_option'
 	function get_this_plugin_option($option_name) {
-		if($this->is_network_activated == true) {
+		if($this->is_network_activated === true) {
 			// Get network site option
 			return get_site_option($option_name);
 		}
@@ -76,7 +76,7 @@ class WPVarnish {
 	}
 	// Wordpress function 'update_site_option' and 'update_option'
 	function update_this_plugin_option($option_name, $option_value) {
-		if($this->is_network_activated == true) {
+		if($this->is_network_activated === true) {
 			// Update network site option
 			return update_site_option($option_name, $option_value);
 		}
@@ -278,14 +278,14 @@ class WPVarnish {
 		$menu_title = 'Varnish aaS';
 		$menu_slug  = 'WPVarnish';
 		$file_name  = 'options.php';
-		if($this->is_network_activated == true) {
+		if($this->is_network_activated === true) {
 			add_submenu_page('settings.php', __($page_title,$this->plugin_group), $menu_title, 'manage_network', $menu_slug, array(&$this, 'WPVarnishAdmin'));
 		}
 		#Add option pages anyway, even for multisites.
 		add_options_page(__($page_title,$this->plugin_group), $menu_title, 'manage_options', $menu_slug, array(&$this, 'WPVarnishAdmin'));
 	}
 	function WPVarnishAdmin() {
-		if($this->is_network_activated == true) {
+		if($this->is_network_activated === true) {
 			if ( !current_user_can( 'manage_network' ) ) {
 				wp_die( __( 'You do not have permission to access this page.' ) );
 			}
@@ -383,7 +383,7 @@ class WPVarnish {
 			<div class="wrap">
 				<h2><?php echo __("Varnish as a Service Administration",$this->plugin_group); ?></h2>
 				<form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
-				<?php if((strpos($_SERVER['REQUEST_URI'], 'network') !== false) || ($this->is_multisite == false)){ ?>
+				<?php if((strpos($_SERVER['REQUEST_URI'], 'network') !=== false) || ($this->is_multisite === false)){ ?>
 				<table width="100%">
 					<tr valign="top">
 						<td>
