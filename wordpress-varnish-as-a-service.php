@@ -35,15 +35,9 @@ class WPVarnish {
 		if ( is_multisite() ) {
 			$this->is_multisite=true;
 		}
-		else {
-			$this->is_multisite=false;
-		}
 		if ( is_multisite() && is_plugin_active_for_network( plugin_basename( __FILE__ ) ) ) {
 			$this->is_network_activated=true;
 			add_action('network_admin_menu', array(&$this, 'WPVarnishAdminMenu'));
-		}
-		else {
-			$this->is_network_activated=false;
 		}
 		add_action('admin_menu', array(&$this, 'WPVarnishAdminMenu'));
 		register_activation_hook( __FILE__, array( &$this, 'activate' ) );
