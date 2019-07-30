@@ -17,6 +17,7 @@ class WPVarnish {
 	public $commenter;
 	public $is_multisite=false;
 	public $is_network_activated=false;
+	public $plugin_group='wp-varnish-aas';
 
 	/**
 	 * __construct
@@ -45,8 +46,8 @@ class WPVarnish {
 		}
 		else {
 			$this->is_network_activated=false;
-			add_action('admin_menu', array(&$this, 'WPVarnishAdminMenu'));
 		}
+		add_action('admin_menu', array(&$this, 'WPVarnishAdminMenu'));
 		register_activation_hook( __FILE__, array( &$this, 'activate' ) );
 		register_deactivation_hook( __FILE__, array( &$this, 'deactivate' ) );
 		add_action('init', array(&$this, 'WPVarnishLocalization'));
@@ -239,7 +240,7 @@ class WPVarnish {
 		}
 	}
 	function WPVarnishLocalization() {
-		load_plugin_textdomain('wp-varnish-aas',false,dirname(plugin_basename(__FILE__)).'/lang/');
+		load_plugin_textdomain($this->plugin_group,false,dirname(plugin_basename(__FILE__)).'/lang/');
 	}
 	function WPVarnishPurgeCommonObjects() {
 		$this->WPVarnishPurgeObject("/");
@@ -280,10 +281,10 @@ class WPVarnish {
 		$menu_slug  = 'WPVarnish';
 		$file_name  = 'options.php';
 		if($this->is_network_activated == true) {
-			add_submenu_page('settings.php', __('Varnish as a Service Configuration','wp-varnish-aas'), $menu_title, 'manage_network', $menu_slug, array(&$this, 'WPVarnishAdmin'));
-		} else {
-			add_options_page(__('Varnish as a Service Configuration','wp-varnish-aas'), $menu_title, 'manage_options', $menu_slug, array(&$this, 'WPVarnishAdmin'));
+			add_submenu_page('settings.php', __($page_title,$this->plugin_group), $menu_title, 'manage_network', $menu_slug, array(&$this, 'WPVarnishAdmin'));
 		}
+		#Add option pages anyway, even for multisites.
+		add_options_page(__($page_title,$this->plugin_group), $menu_title, 'manage_options', $menu_slug, array(&$this, 'WPVarnishAdmin'));
 	}
 	function WPVarnishAdmin() {
 		if($this->is_network_activated == true) {
@@ -352,112 +353,117 @@ class WPVarnish {
 				else
 					$this->update_this_plugin_option("wpvarnish_server_3", 0);
 				?>
-					<div class="updated"><p><?php echo __('Settings Saved!','wp-varnish-aas'); ?></p></div>
+					<div class="updated"><p><?php echo __('Settings Saved!',$this->plugin_group); ?></p></div>
 				<?php
 			}
 			if(isset($_POST['wpvarnish_clear_blog_cache'])) {
 				?>
-				<div class="updated"><p><?php echo __('Purging Everything!','wp-varnish-aas'); ?></p></div>
+				<div class="updated"><p><?php echo __('Purging Everything!',$this->plugin_group); ?></p></div>
 				<?php
 					$this->WPVarnishPurgeAll();
 				}
 			if (isset($_POST['wpvarnish_test_blog_cache_1'])) {
 				?>
-					<div class="updated"><p><?php echo __('Testing Connection to Varnish Server','wp-varnish-aas'); ?> 1</p></div>
+					<div class="updated"><p><?php echo __('Testing Connection to Varnish Server',$this->plugin_group); ?> 1</p></div>
 				<?php
 				$this->WPVarnishTestConnect(1);
 			}
 			if (isset($_POST['wpvarnish_test_blog_cache_2'])) {
 				?>
-					<div class="updated"><p><?php echo __('Testing Connection to Varnish Server','wp-varnish-aas'); ?> 2</p></div>
+					<div class="updated"><p><?php echo __('Testing Connection to Varnish Server',$this->plugin_group); ?> 2</p></div>
 				<?php
 				$this->WPVarnishTestConnect(2);
 			}
 			if (isset($_POST['wpvarnish_test_blog_cache_3'])) {
 				?>
-					<div class="updated"><p><?php echo __('Testing Connection to Varnish Server','wp-varnish-aas'); ?> 3</p></div>
+					<div class="updated"><p><?php echo __('Testing Connection to Varnish Server',$this->plugin_group); ?> 3</p></div>
 				<?php
 									$this->WPVarnishTestConnect(3);
 			}
 		}
 		?>
 			<div class="wrap">
-				<h2><?php echo __("Varnish as a Service Administration",'wp-varnish-aas'); ?></h2>
+				<h2><?php echo __("Varnish as a Service Administration",$this->plugin_group); ?></h2>
 				<form method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
+				<?php if((strpos($_SERVER['REQUEST_URI'], 'network') !== false) || ($this->is_multisite == false)){ ?>
 				<table width="100%">
 					<tr valign="top">
 						<td>
 							<dl>
-								<dt><label for="varactive1"><?php echo __("Server Activated",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varactive1"><?php echo __("Server Activated",$this->plugin_group); ?></label></dt>
 								<dd><input id="varactive1" type="checkbox" name="wpvarnish_server_1" value="1"<?php if($this->get_this_plugin_option("wpvarnish_server_1") == 1) echo ' checked'; ?>></dd>
-								<dt><label for="varipaddress1"><?php echo __("Server IP Address",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varipaddress1"><?php echo __("Server IP Address",$this->plugin_group); ?></label></dt>
 								<dd><input id="varipaddress1" type="text" name="wpvarnish_addr_1" value="<?php echo $this->get_this_plugin_option("wpvarnish_addr_1"); ?>" style="width: 120px;"></dd>
-								<dt><label for="varport1"><?php echo __("Server Port",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varport1"><?php echo __("Server Port",$this->plugin_group); ?></label></dt>
 								<dd><input id="varport1" type="text" name="wpvarnish_port_1" value="<?php echo $this->get_this_plugin_option("wpvarnish_port_1"); ?>" style="width: 50px;"></dd>
-								<dt><label for="varuseadmin1"><?php echo __("Use Admin port",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varuseadmin1"><?php echo __("Use Admin port",$this->plugin_group); ?></label></dt>
 								<dd><input id="varuseadmin1" type="checkbox" name="wpvarnish_use_adminport_1" value="1"<?php if($this->get_this_plugin_option("wpvarnish_use_adminport_1") == 1) echo ' checked'; ?>></dd>
-								<dt><label for="varsecret1"><?php echo __("Secret Key",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varsecret1"><?php echo __("Secret Key",$this->plugin_group); ?></label></dt>
 								<dd><input id="varsecret1" type="text" name="wpvarnish_secret_1" value="<?php echo $this->get_this_plugin_option("wpvarnish_secret_1"); ?>" style="width: 260px;"></dd>
-								<dt><label for="varversion1"><?php echo __("Version",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varversion1"><?php echo __("Version",$this->plugin_group); ?></label></dt>
 								<dd><select id="varversion1" name="wpvarnish_use_version_1">
 									<option value="2"<?php if($this->get_this_plugin_option("wpvarnish_use_version_1") == 2) echo " selected"; ?>>v2 - PURGE</option>
 									<option value="3"<?php if($this->get_this_plugin_option("wpvarnish_use_version_1") == 3) echo " selected"; ?>>v3 - BAN</option>
 								</select></dd>
-								<dt><label for="vartimeout1"><?php echo __("Timeout",'wp-varnish-aas'); ?></label></dt>
-								<dd><input id="vartimeout1" class="small-text" type="text" name="wpvarnish_timeout_1" value="<?php echo $this->get_this_plugin_option("wpvarnish_timeout_1"); ?>"> <?php echo __("seconds",'wp-varnish-aas'); ?></dd>
-								<dt><?php echo __("Test Connection to Varnish",'wp-varnish-aas'); ?></dt>
-								<dd><input type="submit" class="button-secondary" name="wpvarnish_test_blog_cache_1" value="<?php echo __("Test Connection to Varnish",'wp-varnish-aas'); ?>"></dd>
+								<dt><label for="vartimeout1"><?php echo __("Timeout",$this->plugin_group); ?></label></dt>
+								<dd><input id="vartimeout1" class="small-text" type="text" name="wpvarnish_timeout_1" value="<?php echo $this->get_this_plugin_option("wpvarnish_timeout_1"); ?>"> <?php echo __("seconds",$this->plugin_group); ?></dd>
+								<dt><?php echo __("Test Connection to Varnish",$this->plugin_group); ?></dt>
+								<dd><input type="submit" class="button-secondary" name="wpvarnish_test_blog_cache_1" value="<?php echo __("Test Connection to Varnish",$this->plugin_group); ?>"></dd>
 							</dl>
 						</td>
 						<td>
 							<dl>
-								<dt><label for="varactive2"><?php echo __("Server Activated",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varactive2"><?php echo __("Server Activated",$this->plugin_group); ?></label></dt>
 								<dd><input id="varactive2" type="checkbox" name="wpvarnish_server_2" value="1"<?php if($this->get_this_plugin_option("wpvarnish_server_2") == 1) echo ' checked'; ?>></dd>
-								<dt><label for="varipaddress2"><?php echo __("Server IP Address",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varipaddress2"><?php echo __("Server IP Address",$this->plugin_group); ?></label></dt>
 								<dd><input id="varipaddress2" type="text" name="wpvarnish_addr_2" value="<?php echo $this->get_this_plugin_option("wpvarnish_addr_2"); ?>" style="width: 120px;"></dd>
-								<dt><label for="varport2"><?php echo __("Server Port",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varport2"><?php echo __("Server Port",$this->plugin_group); ?></label></dt>
 								<dd><input id="varport2" type="text" name="wpvarnish_port_2" value="<?php echo $this->get_this_plugin_option("wpvarnish_port_2"); ?>" style="width: 50px;"></dd>
-								<dt><label for="varuseadmin2"><?php echo __("Use Admin port",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varuseadmin2"><?php echo __("Use Admin port",$this->plugin_group); ?></label></dt>
 								<dd><input id="varuseadmin2" type="checkbox" name="wpvarnish_use_adminport_2" value="1"<?php if($this->get_this_plugin_option("wpvarnish_use_adminport_2") == 1) echo ' checked'; ?>></dd>
-								<dt><label for="varsecret2"><?php echo __("Secret Key",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varsecret2"><?php echo __("Secret Key",$this->plugin_group); ?></label></dt>
 								<dd><input id="varsecret2" type="text" name="wpvarnish_secret_2" value="<?php echo $this->get_this_plugin_option("wpvarnish_secret_2"); ?>" style="width: 260px;"></dd>
-								<dt><label for="varversion2"><?php echo __("Version",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varversion2"><?php echo __("Version",$this->plugin_group); ?></label></dt>
 								<dd><select id="varversion2" name="wpvarnish_use_version_2">
 									<option value="2"<?php if($this->get_this_plugin_option("wpvarnish_use_version_2") == 2) echo " selected"; ?>>v2 - PURGE</option>
 									<option value="3"<?php if($this->get_this_plugin_option("wpvarnish_use_version_2") == 3) echo " selected"; ?>>v3 - BAN</option>
 								</select></dd>
-								<dt><label for="vartimeout2"><?php echo __("Timeout",'wp-varnish-aas'); ?></label></dt>
-								<dd><input id="vartimeout2" class="small-text" type="text" name="wpvarnish_timeout_2" value="<?php echo $this->get_this_plugin_option("wpvarnish_timeout_2"); ?>"> <?php echo __("seconds",'wp-varnish-aas'); ?></dd>
-								<dt><?php echo __("Test Connection to Varnish",'wp-varnish-aas'); ?></dt>
-								<dd><input type="submit" class="button-secondary" name="wpvarnish_test_blog_cache_2" value="<?php echo __("Test Connection to Varnish",'wp-varnish-aas'); ?>"></dd>
+								<dt><label for="vartimeout2"><?php echo __("Timeout",$this->plugin_group); ?></label></dt>
+								<dd><input id="vartimeout2" class="small-text" type="text" name="wpvarnish_timeout_2" value="<?php echo $this->get_this_plugin_option("wpvarnish_timeout_2"); ?>"> <?php echo __("seconds",$this->plugin_group); ?></dd>
+								<dt><?php echo __("Test Connection to Varnish",$this->plugin_group); ?></dt>
+								<dd><input type="submit" class="button-secondary" name="wpvarnish_test_blog_cache_2" value="<?php echo __("Test Connection to Varnish",$this->plugin_group); ?>"></dd>
 							</dl>
 						</td>
 						<td>
 							<dl>
-								<dt><label for="varactive3"><?php echo __("Server Activated",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varactive3"><?php echo __("Server Activated",$this->plugin_group); ?></label></dt>
 								<dd><input id="varactive3" type="checkbox" name="wpvarnish_server_3" value="1"<?php if($this->get_this_plugin_option("wpvarnish_server_3") == 1) echo ' checked'; ?>></dd>
-								<dt><label for="varipaddress3"><?php echo __("Server IP Address",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varipaddress3"><?php echo __("Server IP Address",$this->plugin_group); ?></label></dt>
 								<dd><input id="varipaddress3" type="text" name="wpvarnish_addr_3" value="<?php echo $this->get_this_plugin_option("wpvarnish_addr_3"); ?>" style="width: 120px;"></dd>
-								<dt><label for="varport3"><?php echo __("Server Port",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varport3"><?php echo __("Server Port",$this->plugin_group); ?></label></dt>
 								<dd><input id="varport3" type="text" name="wpvarnish_port_3" value="<?php echo $this->get_this_plugin_option("wpvarnish_port_3"); ?>" style="width: 50px;"></dd>
-								<dt><label for="varuseadmin3"><?php echo __("Use Admin port",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varuseadmin3"><?php echo __("Use Admin port",$this->plugin_group); ?></label></dt>
 								<dd><input id="varuseadmin3" type="checkbox" name="wpvarnish_use_adminport_3" value="1"<?php if($this->get_this_plugin_option("wpvarnish_use_adminport_3") == 1) echo ' checked'; ?>></dd>
-								<dt><label for="varsecret3"><?php echo __("Secret Key",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varsecret3"><?php echo __("Secret Key",$this->plugin_group); ?></label></dt>
 								<dd><input id="varsecret3" type="text" name="wpvarnish_secret_3" value="<?php echo $this->get_this_plugin_option("wpvarnish_secret_3"); ?>" style="width: 260px;"></dd>
-								<dt><label for="varversion3"><?php echo __("Version",'wp-varnish-aas'); ?></label></dt>
+								<dt><label for="varversion3"><?php echo __("Version",$this->plugin_group); ?></label></dt>
 								<dd><select id="varversion3" name="wpvarnish_use_version_3">
 									<option value="2"<?php if($this->get_this_plugin_option("wpvarnish_use_version_3") == 2) echo " selected"; ?>>v2 - PURGE</option>
 									<option value="3"<?php if($this->get_this_plugin_option("wpvarnish_use_version_3") == 3) echo " selected"; ?>>v3 - BAN</option>
 								</select></dd>
-								<dt><label for="vartimeout3"><?php echo __("Timeout",'wp-varnish-aas'); ?></label></dt>
-								<dd><input id="vartimeout3" class="small-text" type="text" name="wpvarnish_timeout_3" value="<?php echo $this->get_this_plugin_option("wpvarnish_timeout_3"); ?>"> <?php echo __("seconds",'wp-varnish-aas'); ?></dd>
-								<dt><?php echo __("Test Connection to Varnish",'wp-varnish-aas'); ?></dt>
-								<dd><input type="submit" class="button-secondary" name="wpvarnish_test_blog_cache_3" value="<?php echo __("Test Connection to Varnish",'wp-varnish-aas'); ?>"></dd>
+								<dt><label for="vartimeout3"><?php echo __("Timeout",$this->plugin_group); ?></label></dt>
+								<dd><input id="vartimeout3" class="small-text" type="text" name="wpvarnish_timeout_3" value="<?php echo $this->get_this_plugin_option("wpvarnish_timeout_3"); ?>"> <?php echo __("seconds",$this->plugin_group); ?></dd>
+								<dt><?php echo __("Test Connection to Varnish",$this->plugin_group); ?></dt>
+								<dd><input type="submit" class="button-secondary" name="wpvarnish_test_blog_cache_3" value="<?php echo __("Test Connection to Varnish",$this->plugin_group); ?>"></dd>
 							</dl>
 						</td>
 					</tr>
 				</table>
-				<p class="submit"><input type="submit" class="button-primary" name="wpvarnish_admin" value="<?php echo __("Save Changes",'wp-varnish-aas'); ?>"> <input type="submit" class="button-secondary" name="wpvarnish_clear_blog_cache" value="<?php echo __("Purge All Blog Cache",'wp-varnish-aas'); ?>"></p>
+
+				<p class="submit">
+					<input type="submit" class="button-primary" name="wpvarnish_admin" value="<?php echo __("Save Changes",$this->plugin_group); ?>">
+				<?php } ?>
+					<input type="submit" class="button-secondary" name="wpvarnish_clear_blog_cache" value="<?php echo __("Purge All Blog Cache",$this->plugin_group); ?>"></p>
 				</form>
 			</div>
 		<?php
@@ -589,19 +595,19 @@ class WPVarnish {
 		$wpv_host = preg_replace($wpv_replace_wpurl, "$1", $wpv_wpurl);
 		$wpv_url = $wpv_blogaddr."/";
 		$varnish_test_conn .= "<ul>\n";
-		$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - Testing Server",'wp-varnish-aas')." ".$servernum."</span></li>\n";
+		$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - Testing Server",$this->plugin_group)." ".$servernum."</span></li>\n";
 		$varnish_sock = fsockopen($wpv_purgeaddr, $wpv_purgeport, $errno, $errstr, $wpv_timeout);
 		if($varnish_sock) {
-			$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Connection to Server",'wp-varnish-aas')."</span></li>\n";
+			$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Connection to Server",$this->plugin_group)."</span></li>\n";
 			if ($wpv_use_adminport) {
-				$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - Using Admin Port",'wp-varnish-aas')."</span></li>\n";
+				$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - Using Admin Port",$this->plugin_group)."</span></li>\n";
 				$buf = fread($varnish_sock, 1024);
 				if(preg_match('/(\w+)\s+Authentication required./', $buf, $matches)) {
 					$auth = $this->WPAuth($matches[1], $wpv_secret);
 					fwrite($varnish_sock, "auth ".$auth."\n");
 					$buf = fread($varnish_sock, 1024);
 					if(preg_match('/^200/', $buf)) {
-						$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Authentication",'wp-varnish-aas')."</span></li>\n";
+						$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Authentication",$this->plugin_group)."</span></li>\n";
 						if ($wpv_use_version == 2) {
 							$out = "purge req.url ~ ^$wpv_url && req.http.host == $wpv_host\n";
 						} elseif ($wpv_use_version == 3) {
@@ -612,15 +618,15 @@ class WPVarnish {
 						fwrite($varnish_sock, $out."\n");
 						$buf = fread($varnish_sock, 256);
 						if(preg_match('/^200/', $buf)) {
-							$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Cache flush",'wp-varnish-aas')."</span></li>\n";
+							$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Cache flush",$this->plugin_group)."</span></li>\n";
 						} else {
-							$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Cache flush",'wp-varnish-aas')."</span><br><small>".__("Verify your Varnish version",'wp-varnish-aas')."</small></li>\n";
+							$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Cache flush",$this->plugin_group)."</span><br><small>".__("Verify your Varnish version",$this->plugin_group)."</small></li>\n";
 						}
 					} else {
-						$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Invalid Secret Key",'wp-varnish-aas')."</span></li>\n";
+						$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Invalid Secret Key",$this->plugin_group)."</span></li>\n";
 					}
 				} else {
-					$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - Authentication not required",'wp-varnish-aas')."</span></li>\n";
+					$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - Authentication not required",$this->plugin_group)."</span></li>\n";
 					if ($wpv_use_version == 2) {
 						$out = "purge req.url ~ ^$wpv_url && req.http.host == $wpv_host\n";
 					} elseif ($wpv_use_version == 3) {
@@ -631,14 +637,14 @@ class WPVarnish {
 					fwrite($varnish_sock, $out."\n");
 					$buf = fread($varnish_sock, 256);
 					if(preg_match('/^200/', $buf)) {
-						$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Cache flush",'wp-varnish-aas')."</span></li>\n";
+						$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Cache flush",$this->plugin_group)."</span></li>\n";
 					} else {
-						$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Cache flush",'wp-varnish-aas')."</span><br><small>".__("Verify your Varnish version",'wp-varnish-aas')."</small></li>\n";
+						$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Cache flush",$this->plugin_group)."</span><br><small>".__("Verify your Varnish version",$this->plugin_group)."</small></li>\n";
 					}
 				}
 			} else {
 				if ($wpv_use_version == 3) {
-					$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - HTTP BAN",'wp-varnish-aas')."</span></li>\n";
+					$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - HTTP BAN",$this->plugin_group)."</span></li>\n";
 					$out = "BAN HTTP/1.0\r\n";
 					$out .= "X-Ban-Url: $wpv_url\r\n";
 					$out .= "X-Ban-Host: $wpv_host\r\n";
@@ -646,28 +652,28 @@ class WPVarnish {
 					fwrite($varnish_sock, $out."\n");
 					$buf = fread($varnish_sock, 256);
 					if(preg_match('/200/', $buf)) {
-						$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Cache flush",'wp-varnish-aas')."</span></li>\n";
+						$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Cache flush",$this->plugin_group)."</span></li>\n";
 					} else {
-						$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Cache flush",'wp-varnish-aas')."</span><br><small>".__("Verify your Varnish version",'wp-varnish-aas')."</small></li>\n";
+						$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Cache flush",$this->plugin_group)."</span><br><small>".__("Verify your Varnish version",$this->plugin_group)."</small></li>\n";
 					}
 
 				} else {
-					$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - HTTP Purge",'wp-varnish-aas')."</span></li>\n";
+					$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - HTTP Purge",$this->plugin_group)."</span></li>\n";
 					$out = "PURGE $wpv_url HTTP/1.0\r\n";
 					$out .= "Host: $wpv_host\r\n";
 					$out .= "Connection: Close\r\n\r\n";
 					fwrite($varnish_sock, $out);
 					$buf = fread($varnish_sock, 256);
 					if(preg_match('/200 OK/', $buf)) {
-						$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Request",'wp-varnish-aas')."</span></li>\n";
+						$varnish_test_conn .= "<li><span style=\"color: green;\">".__("OK - Request",$this->plugin_group)."</span></li>\n";
 					} else {
-						$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Request",'wp-varnish-aas')."</span></li>\n";
+						$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Request",$this->plugin_group)."</span></li>\n";
 					}
 				}
 			}
 			fclose($varnish_sock);
 		} else {
-			$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Connection to Server",'wp-varnish-aas')."</span><br><small>".__("IP address or port closed. Verify your firewall or iptables.",'wp-varnish-aas')."</small></li>\n";
+			$varnish_test_conn .= "<li><span style=\"color: red;\">".__("KO - Connection to Server",$this->plugin_group)."</span><br><small>".__("IP address or port closed. Verify your firewall or iptables.",$this->plugin_group)."</small></li>\n";
 		}
 		$varnish_test_conn .= "</ul>\n";
 		?>
