@@ -626,4 +626,6 @@ class WPVarnish {
 	}
 }
 
-new WPVarnish();
+if ( is_admin() ) {
+	new WPVarnish();
+ }
