@@ -27,8 +27,6 @@ class WPVarnish {
 	 **/
 	public function __construct() {
 		global $post;
-		global $is_multisite;
-		global $is_network_activated;
 
 		if ( !function_exists( 'is_plugin_active_for_network' ) ) {
 			// Makes sure the plugin is defined before trying to use it
