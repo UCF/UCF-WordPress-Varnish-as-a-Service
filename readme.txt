@@ -28,6 +28,12 @@ Based on <a href="http://wordpress.org/extend/plugins/wordpress-varnish/">WordPr
 
 == Changelog ==
 
+= 1.3.0 =
+ * Update plugin to support multisite.
+ * Save configurations to network site options.
+ * Stop plugin from being loaded on client side requests.
+ * Requires plugin to be uninstalled + reinstalled, or deactivated + activated and settings reconfigured at network level.
+
 = 1.2.11 =
  * Fix PHP7+ deprecated warnings on constructor name.
 
