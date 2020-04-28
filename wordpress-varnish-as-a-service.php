@@ -55,6 +55,7 @@ class WPVarnish {
 		add_action('add_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
 		add_action('edit_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
 		add_action('delete_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
+		add_action('update_option_permalink_structure', array(&$this, 'WPVarnishPurgeAll'), 99);
 		add_filter('wp_get_current_commenter', array(&$this, "wp_get_current_commenter_varnish"));
 	}
 	// Wordpress function 'get_site_option' and 'get_option'
