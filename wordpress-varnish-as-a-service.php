@@ -422,7 +422,7 @@ class WPVarnish {
 		$sha256 = hash_final($ctx);
 		return $sha256;
 	}
-	function WPVarnishPurgeObject($wpv_url) {
+	function WPVarnishPurgeObject($wpv_url_obj) {
 		global $varnish_servers;
 		$j=0;
 		if($this->get_this_plugin_option("wpvarnish_server_1")) {
@@ -463,7 +463,7 @@ class WPVarnish {
 			$wpv_replace_wpurl = '/^https?:\/\/([^\/]+)(.*)/i';
 			$wpv_host = preg_replace($wpv_replace_wpurl, "$1", $wpv_wpurl);
 			$wpv_blogaddr = preg_replace($wpv_replace_wpurl, "$2", $wpv_wpurl);
-			$wpv_url = $wpv_blogaddr.$wpv_url;
+			$wpv_url = $wpv_blogaddr.$wpv_url_obj;
 			$varnish_sock = fsockopen($wpv_purgeaddr, $wpv_purgeport, $errno, $errstr, $wpv_timeout);
 			if($varnish_sock) {
 				if($wpv_use_adminport) {
