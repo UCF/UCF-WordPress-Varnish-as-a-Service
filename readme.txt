@@ -1,7 +1,7 @@
 === Plugin Name ===
 Contributors: jartes, JavierCasares
 Tags: varnish, cache, purge, ban
-Requires at least: 2.5
+Requires at least: 4.4.0
 Tested up to: 4.9.5
 Stable tag: 1.2.3
 
