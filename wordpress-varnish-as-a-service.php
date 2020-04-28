@@ -55,6 +55,10 @@ class WPVarnish {
 		add_action('add_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
 		add_action('edit_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
 		add_action('delete_attachment', array(&$this, 'WPVarnishPurgeAttachment'), 99);
+		add_action('wp_update_nav_menu', array(&$this, 'WPVarnishPurgeAll'), 99);
+		add_action('wp_delete_nav_menu', array(&$this, 'WPVarnishPurgeAll'), 99);
+		add_action('wp_add_nav_menu_item', array(&$this, 'WPVarnishPurgeAll'), 99);
+		add_action('wp_update_nav_menu_item', array(&$this, 'WPVarnishPurgeAll'), 99);
 		add_action('update_option_permalink_structure', array(&$this, 'WPVarnishPurgeAll'), 99);
 		add_filter('wp_get_current_commenter', array(&$this, "wp_get_current_commenter_varnish"));
 	}
