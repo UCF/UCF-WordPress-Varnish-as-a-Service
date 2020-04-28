@@ -541,6 +541,7 @@ class WPVarnish {
 		$wpv_wpurl = get_bloginfo("wpurl");
 		$wpv_replace_wpurl = '/^https?:\/\/([^\/]+)(.*)/i';
 		$wpv_host = preg_replace($wpv_replace_wpurl, "$1", $wpv_wpurl);
+		$wpv_blogaddr = preg_replace($wpv_replace_wpurl, "$2", $wpv_wpurl);
 		$wpv_url = $wpv_blogaddr."/";
 		$varnish_test_conn .= "<ul>\n";
 		$varnish_test_conn .= "<li><span style=\"color: blue;\">".__("INFO - Testing Server",$this->plugin_group)." ".$servernum."</span></li>\n";
