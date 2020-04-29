@@ -62,7 +62,6 @@ class WPVarnish {
 		add_action('update_option_category_base', array(&$this, 'WPVarnishPurgeAll'), 99);
 		add_action('update_option_tag_base', array(&$this, 'WPVarnishPurgeAll'), 99);
 		add_action('permalink_structure_changed', array(&$this, 'WPVarnishPurgeAll'), 99);
-		add_action('update_option_permalink_structure', array(&$this, 'WPVarnishPurgeAll'), 99);
 		add_filter('wp_get_current_commenter', array(&$this, "wp_get_current_commenter_varnish"));
 	}
 	// Wordpress function 'get_site_option' and 'get_option'
