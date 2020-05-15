@@ -634,8 +634,7 @@ if ( ! class_exists( 'WPVarnish' ) ) {
 			<?php
 		}
 	}
+	if ( is_admin() ) {
+		new WPVarnish();
+	}
 }
-
-if ( is_admin() ) {
-	new WPVarnish();
- }
