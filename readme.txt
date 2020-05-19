@@ -1,8 +1,8 @@
 === Plugin Name ===
 Contributors: jartes, JavierCasares
 Tags: varnish, cache, purge, ban
-Requires at least: 2.5
-Tested up to: 4.9.5
+Requires at least: 4.4.0
+Tested up to: 5.3.0
 Stable tag: 1.2.3
 
 Clear your Varnish cache when new, edited or deleted content happens.
@@ -27,6 +27,13 @@ Based on <a href="http://wordpress.org/extend/plugins/wordpress-varnish/">WordPr
 1. Configuration.
 
 == Changelog ==
+
+= 1.3.1 =
+ * Fix ban on second and third varnish cache servers.
+ * Add ban on menu edit
+ * Fix Undefined variable notice.
+ * Add ban on permalink update.
+ * Fix duplicate class / instantiate object critcal error.
 
 = 1.3.0 =
  * Update plugin to support multisite.
