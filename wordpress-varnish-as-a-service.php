@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: UCF WordPress Varnish as a Service
-Version: 1.3.0
+Version: 1.3.1
 Author: Joan Artés
 Author URI: http://joanartes.com/
 Plugin URI: http://joanartes.com/wordpress-varnish-as-a-service/
